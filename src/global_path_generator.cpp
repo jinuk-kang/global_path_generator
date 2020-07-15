@@ -2,8 +2,7 @@
 
 // initialize subscriber and parameters
 GlobalPathGenerator::GlobalPathGenerator() {
-    ros::NodeHandle nh_;
-    odom_sub_ = nh_.subcribe("/odom", 1, &GlobalPathGenerator::odomCallback, this);
+    odom_sub_ = nh_.subscribe("/odom", 1, &GlobalPathGenerator::odomCallback, this);
 
     // params
     nh_.setParam("/stop_flag", false);
@@ -16,19 +15,21 @@ GlobalPathGenerator::GlobalPathGenerator() {
 }
 
 // get odometry data from hdl_localization node
-void GlobalPathGenerator:::odomCallback(const nav_msgs::Odometry::ConstPtr& odom) {
+void GlobalPathGenerator::odomCallback(const nav_msgs::Odometry::ConstPtr &odom) {
 
     nh_.getParam("/stop_flag", stop_flag_);
 
+	OdomDouble odomDouble(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z);
+
     if (!stop_flag_) {
-        printOdom(odom);
+        printOdom(odomDouble);
 
         if (!path_.empty()) {
-            double x = odom->pose.pose.position.x;
-            double y = odom->pose.pose.position.y;
+            double x = odomDouble.getX();
+            double y = odomDouble.getY();
 
-            double last_x = path_.back()->pose.pose.position.x;
-            double last_y = path_.back()->pose.pose.position.y;
+            double last_x = path_.at(path_.size()-1).getX();
+            double last_y = path_.at(path_.size()-1).getY();
 
             double dist = sqrt(pow((last_x-x), 2) + pow(last_y-y, 2));
 
@@ -38,16 +39,12 @@ void GlobalPathGenerator:::odomCallback(const nav_msgs::Odometry::ConstPtr& odom
             }
         }
 
-        path_.push_back(odom);
+        path_.push_back(odomDouble);
     }
 }
 
-void GlobalPathGenerator::printOdom(const nav_msgs::Odometry::ConstPtr& odom) { 
-    double x = odom->pose.pose.position.x;
-    double y = odom->pose.pose.position.y;
-    double z = odom->pose.pose.position.z;
-
-    ROS_INFO("< %f, %f, %f >", x, y, z);
+void GlobalPathGenerator::printOdom(OdomDouble odomDouble) { 
+    ROS_INFO("< %f, %f, %f >", odomDouble.getX(), odomDouble.getY(), odomDouble.getZ());
 }
 
 // save the path using odometry data
@@ -57,9 +54,9 @@ void GlobalPathGenerator::savePath() {
     ofstream file(FILE_NAME);
 
     for (auto odom : path_) {
-        double x = odom->pose.pose.position.x;
-        double y = odom->pose.pose.position.y;
-        double z = odom->pose.pose.position.z;
+        double x = odom.getX();
+        double y = odom.getY();
+        double z = odom.getZ();
 
         if (file.is_open()) {
             string row = to_string(x) + "," + to_string(y) + "," + to_string(z) + "\n";
@@ -81,18 +78,18 @@ int main(int argc, char **argv) {
     ros::Rate loop_rate(LOOP_RATE);
 
     while(ros::ok()) {
-        nh_.getParam("/stop_flag", stop_flag_);
-        nh_.getParam("/clear_flag", clear_flag_);
+        globalPathGenerator.nh_.getParam("/stop_flag", globalPathGenerator.stop_flag_);
+        globalPathGenerator.nh_.getParam("/clear_flag", globalPathGenerator.clear_flag_);
 
-        if (clear_flag_) {
-            path_.clear();
-            nh_.setParam("/clear_flag", false);
-            clear_flag_ = false;
+        if (globalPathGenerator.clear_flag_) {
+            globalPathGenerator.path_.clear();
+            globalPathGenerator.nh_.setParam("/clear_flag", false);
+            globalPathGenerator.clear_flag_ = false;
         }
 
-        if (stop_flag_) {
+        if (globalPathGenerator.stop_flag_) {
             cout << "odomCallback stopped" << endl;
-            savePath();
+            globalPathGenerator.savePath();
             cout << "node terminated" << endl;
             ros::shutdown();
         }

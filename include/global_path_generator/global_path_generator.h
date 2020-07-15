@@ -22,17 +22,61 @@ using namespace std;
 // dist_hp -> determine the distance between points in the path
 //
 
+class OdomDouble {
+	private:
+		double x;
+		double y;
+		double z;
+	public:
+		OdomDouble() {}
+
+		OdomDouble(double x, double y, double z) {
+			this->x = x;
+			this->y = y;
+			this->z = z;
+		}
+
+		// setter
+		void setX(double x) {
+			this->x = x;
+		}
+
+		void setY(double y) {
+			this->y = y;
+		}
+
+		void setZ(double z) {
+			this->z = z;
+		}
+
+		// getter
+		double getX() {
+			return this->x;
+		}
+
+		double getY() {
+			return this->x;
+		}
+
+		double getZ() {
+			return this->x;
+		}
+};
+
 class GlobalPathGenerator {
-    private:
+
+    public:
+		ros::NodeHandle nh_;
         ros::Subscriber odom_sub_;
-        vector<nav_msgs::Odometry> path_;
+        vector<OdomDouble> path_;
+
+		GlobalPathGenerator();
 
         bool stop_flag_;
         bool clear_flag_;
         double dist_hp_;
 
-    public:
         void odomCallback(const nav_msgs::Odometry::ConstPtr& odom);
-        void printOdom(const nav_msgs::Odometry::ConstPtr& odom);
+        void printOdom(OdomDouble odomDouble);
         void savePath();
 };

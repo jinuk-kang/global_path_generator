@@ -10,7 +10,7 @@
 
 #define FILE_NAME "path.txt"
 #define LOOP_RATE 10 // use it for sleep time to determine the distance between points in the path
-#define INIT_DIST_HP 0.5
+#define INIT_DIST_HP 0.00001
 
 using namespace std;
 
@@ -55,20 +55,21 @@ class OdomDouble {
 		}
 
 		double getY() {
-			return this->x;
+			return this->y;
 		}
 
 		double getZ() {
-			return this->x;
+			return this->z;
 		}
 };
 
 class GlobalPathGenerator {
+	private:
+        vector<OdomDouble> path_;
 
     public:
 		ros::NodeHandle nh_;
         ros::Subscriber odom_sub_;
-        vector<OdomDouble> path_;
 
 		GlobalPathGenerator();
 
@@ -78,5 +79,7 @@ class GlobalPathGenerator {
 
         void odomCallback(const nav_msgs::Odometry::ConstPtr& odom);
         void printOdom(OdomDouble odomDouble);
+		void clearPath();
+		OdomDouble getLastOdom();
         void savePath();
 };

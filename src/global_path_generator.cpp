@@ -24,12 +24,12 @@ void GlobalPathGenerator::odomCallback(const nav_msgs::Odometry::ConstPtr &odom)
     if (!stop_flag_) {
         printOdom(odomDouble);
 
-        if (!path_.empty()) {
+        if (!this->path_.empty()) {
             double x = odomDouble.getX();
             double y = odomDouble.getY();
 
-            double last_x = path_.at(path_.size()-1).getX();
-            double last_y = path_.at(path_.size()-1).getY();
+            double last_x = getLastOdom().getX();
+            double last_y = getLastOdom().getY();
 
             double dist = sqrt(pow((last_x-x), 2) + pow(last_y-y, 2));
 
@@ -39,21 +39,34 @@ void GlobalPathGenerator::odomCallback(const nav_msgs::Odometry::ConstPtr &odom)
             }
         }
 
-        path_.push_back(odomDouble);
+		this->path_.push_back(odomDouble);
     }
 }
 
 void GlobalPathGenerator::printOdom(OdomDouble odomDouble) { 
-    ROS_INFO("< %f, %f, %f >", odomDouble.getX(), odomDouble.getY(), odomDouble.getZ());
+	cout << "x : " << odomDouble.getX() << endl;
+	cout << "y : " << odomDouble.getY() << endl;
+	cout << "z : " << odomDouble.getZ() << endl;
+	cout << endl;
+
+    //ROS_INFO("< %f, %f, %f >", odomDouble.getX(), odomDouble.getY(), odomDouble.getZ());
+}
+
+OdomDouble GlobalPathGenerator::getLastOdom() {
+	return this->path_.back();
+}
+
+void GlobalPathGenerator::clearPath() {
+	this->path_.clear();
 }
 
 // save the path using odometry data
 void GlobalPathGenerator::savePath() {
-    cout << "start saving path" << endl;
+    cout << "start saving path..." << endl;
     
     ofstream file(FILE_NAME);
 
-    for (auto odom : path_) {
+    for (auto odom : this->path_) {
         double x = odom.getX();
         double y = odom.getY();
         double z = odom.getZ();
@@ -66,9 +79,12 @@ void GlobalPathGenerator::savePath() {
 
     file.close();
 
+	cout << endl;
     cout << "--- saved path successfully ---" << endl;
     cout << "text file path -> " << "./" << FILE_NAME << endl;
-    cout << "path size -> " << to_string(path_.size()) << endl;
+    cout << "path size -> " << to_string(this->path_.size()) << endl;
+    cout << "-------------------------------" << endl;
+	cout << endl;
 }
 
 int main(int argc, char **argv) {
@@ -82,15 +98,17 @@ int main(int argc, char **argv) {
         globalPathGenerator.nh_.getParam("/clear_flag", globalPathGenerator.clear_flag_);
 
         if (globalPathGenerator.clear_flag_) {
-            globalPathGenerator.path_.clear();
+            globalPathGenerator.clearPath();
             globalPathGenerator.nh_.setParam("/clear_flag", false);
             globalPathGenerator.clear_flag_ = false;
         }
 
         if (globalPathGenerator.stop_flag_) {
+			cout << endl;
             cout << "odomCallback stopped" << endl;
             globalPathGenerator.savePath();
             cout << "node terminated" << endl;
+			cout << endl;
             ros::shutdown();
         }
 

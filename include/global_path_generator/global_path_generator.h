@@ -8,7 +8,7 @@
 #include <string>
 #include <cmath>
 
-#define FILE_NAME "path.txt"
+#define FILE_NAME "/home/path.txt"
 #define LOOP_RATE 10 // use it for sleep time to determine the distance between points in the path
 #define INIT_DIST_HP 0.00001
 

@@ -24,12 +24,8 @@ using namespace std;
 
 class OdomDouble {
 	private:
-		double x;
-		double y;
-		double z;
-		double o_x;
-		double o_y;
-		double o_z;
+		double x, y, z;
+		double o_x, o_y, o_z, o_w;
 
 	public:
 		OdomDouble() {}

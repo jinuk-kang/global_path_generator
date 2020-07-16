@@ -89,7 +89,7 @@ void GlobalPathGenerator::savePath() {
 
 	cout << endl;
     cout << "--- saved path successfully ---" << endl;
-    cout << "text file path -> " >> FILE_NAME << endl;
+    cout << "text file path -> " << FILE_NAME << endl;
     cout << "path size -> " << to_string(this->path_.size()) << endl;
     cout << "-------------------------------" << endl;
 	cout << endl;

@@ -34,13 +34,14 @@ class OdomDouble {
 	public:
 		OdomDouble() {}
 
-		OdomDouble(double x, double y, double z, double o_x, double o_y, double o_z) {
+		OdomDouble(double x, double y, double z, double o_x, double o_y, double o_z, double o_w) {
 			this->x = x;
 			this->y = y;
 			this->z = z;
 			this->o_x = o_x;
 			this->o_y = o_y;
 			this->o_z = o_z;
+			this->o_w = o_w;
 		}
 
 		// setter
@@ -68,6 +69,10 @@ class OdomDouble {
 			this->o_z = o_z;
 		}
 
+		void setOW(double o_w) {
+			this->o_w = o_w;
+		}
+
 		// getter
 		double getX() {
 			return this->x;
@@ -91,6 +96,10 @@ class OdomDouble {
 
 		double getOZ() {
 			return this->o_z;
+		}
+
+		double getOW() {
+			return this->o_w;
 		}
 };
 

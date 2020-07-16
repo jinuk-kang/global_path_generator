@@ -19,7 +19,7 @@ void GlobalPathGenerator::odomCallback(const nav_msgs::Odometry::ConstPtr &odom)
 
     nh_.getParam("/stop_flag", stop_flag_);
 
-	OdomDouble odomDouble(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z);
+	OdomDouble odomDouble(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z, odom->pose.pose.orientation.x, odom->pose.pose.orientation.y, odom->pose.pose.orientation.z, odom->pose.pose.orientation.w);
 
     if (!stop_flag_) {
         printOdom(odomDouble);
@@ -47,6 +47,10 @@ void GlobalPathGenerator::printOdom(OdomDouble odomDouble) {
 	cout << "x : " << odomDouble.getX() << endl;
 	cout << "y : " << odomDouble.getY() << endl;
 	cout << "z : " << odomDouble.getZ() << endl;
+	cout << "o_x : " << odomDouble.getOX() << endl;
+	cout << "o_y : " << odomDouble.getOY() << endl;
+	cout << "o_z : " << odomDouble.getOZ() << endl;
+	cout << "o_w : " << odomDouble.getOW() << endl;
 	cout << endl;
 
     //ROS_INFO("< %f, %f, %f >", odomDouble.getX(), odomDouble.getY(), odomDouble.getZ());
@@ -70,9 +74,13 @@ void GlobalPathGenerator::savePath() {
         double x = odom.getX();
         double y = odom.getY();
         double z = odom.getZ();
+        double o_x = odom.getOX();
+        double o_y = odom.getOY();
+        double o_z = odom.getOZ();
+        double o_w = odom.getOW();
 
         if (file.is_open()) {
-            string row = to_string(x) + "," + to_string(y) + "," + to_string(z) + "\n";
+            string row = to_string(x) + "," + to_string(y) + "," + to_string(z) + "," + to_string(o_x) + "," + to_string(o_y) + "," + to_string(o_z) + "," + to_string(o_w) + "\n";
             file << row;
         }
     }

@@ -66,6 +66,11 @@ void GlobalPathGenerator::clearPath() {
 
 // save the path using odometry data
 void GlobalPathGenerator::savePath() {
+
+	if (access(FILE_NAME, 0) == 0) {
+		int result = remove(FILE_NAME);
+	}
+
     cout << "start saving path..." << endl;
     
     ofstream file(FILE_NAME);
